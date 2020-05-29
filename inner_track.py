@@ -9,7 +9,7 @@ def find_odds():
     pre_odds.pop(10)
     print(pre_odds)
     odds = pre_odds
-    shot = screenshot(region=(180, 354, 78, 680))
+    shot = screenshot(region=(180, 320, 78, 680))
     shot.save('./pics/horses.png')
     # Checks each pic of odds 1/1, 2/1, etc
     horses = []
@@ -17,10 +17,10 @@ def find_odds():
         for odd in list(locateAll('./odds/'+str(n)+'.png', './pics/horses.png', confidence=.92)):
             add_horse = True
             for horse in horses:
-                if abs(horse[1][1] - (odd.top + 364)) < 30:
+                if abs(horse[1][1] - (odd.top + 320)) < 30:
                     add_horse = False
             if add_horse is True:
-                adjusted_odd = (odd.left+180, odd.top+354, odd.width, odd.height)
+                adjusted_odd = (odd.left+180, odd.top+320, odd.width, odd.height)
                 horses.append((n, adjusted_odd))
                 print(str(n))
     # Calculates percentage from the present contestant's odds and sums them all
