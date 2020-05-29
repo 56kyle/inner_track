@@ -5,20 +5,24 @@ import input
 
 
 def find_odds():
-    odds = range(1, 31)
-    shot = screenshot(region=(184, 354, 78, 680))
+    pre_odds = list(range(1, 31))
+    pre_odds.pop(10)
+    print(pre_odds)
+    odds = pre_odds
+    shot = screenshot(region=(180, 354, 78, 680))
     shot.save('./pics/horses.png')
     # Checks each pic of odds 1/1, 2/1, etc
     horses = []
     for n in odds:
-        add_horse = True
-        for odd in list(locateAll('./odds/'+str(n)+'.png', './pics/horses.png', confidence=.9)):
+        for odd in list(locateAll('./odds/'+str(n)+'.png', './pics/horses.png', confidence=.92)):
+            add_horse = True
             for horse in horses:
                 if abs(horse[1][1] - (odd.top + 364)) < 30:
                     add_horse = False
             if add_horse is True:
-                adjusted_odd = (odd.left+184, odd.top+354, odd.width, odd.height)
+                adjusted_odd = (odd.left+180, odd.top+354, odd.width, odd.height)
                 horses.append((n, adjusted_odd))
+                print(str(n))
     # Calculates percentage from the present contestant's odds and sums them all
     high = horses[0]
     total_odds = 0
@@ -29,7 +33,7 @@ def find_odds():
         total_odds += percent
     # Ensures no contestant was missed
     if len(horses) != 6:
-        raise Exception
+        return high, 322
     return high, total_odds
 
 
@@ -37,6 +41,7 @@ def enter_betting_menu():
     p1 = Point(random.randrange(1206, 1678), random.randrange(867, 951))
     moveTo(p1.x, p1.y)
     input.enter()
+    time.sleep(.1)
 
 
 def select_best_odds():
@@ -71,13 +76,13 @@ def back_to_starting_screen():
 def main():
     while True:
         if keyboard.is_pressed('1'):
-            print('T minus 5 seconds')
             break
-    time.sleep(5)
+    time.sleep(1)
 
     while not keyboard.is_pressed('0'):
         enter_betting_menu()
         total_odds = select_best_odds()
+        print(str(total_odds))
         adjust_and_place_bet(total_odds)
         back_to_starting_screen()
 
