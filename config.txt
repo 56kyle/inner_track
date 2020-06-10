@@ -1,0 +1,21 @@
+
+left_bound = 185
+right_bound = 210
+
+top1 = 352
+bot1 = 376
+
+top2 = 474
+bot2 = 497
+
+top3 = 595
+bot3 = 619
+
+top4 = 717
+bot4 = 740
+
+top5 = 838
+bot5 = 862
+
+top6 = 960
+bot6 = 983

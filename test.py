@@ -1,37 +1,44 @@
-from pyautogui import *
+import win32gui
+import pyautogui
+import time
 import keyboard
-import random
 
 
-resources = './resources/'
-files = [
-    '0.png',
-    '1.png',
-    '2.png',
-    '3.png',
-    '4.png',
-    '5.png',
-    '6.png',
-    '7.png',
-    '8.png',
-    '9.png'
-]
+class Session:
+    def __init__(self, config):
+        self.round = 0
+        self.config = {}
+        for key, value in config.items():
+            self.config[key] = value
+
+    def take_pics_of_odds(self, *args):
+        self.round += 1
+        for i in range(1, 7):
+            left_bound = int(self.config['left_bound'])
+            right_bound = int(self.config['right_bound'])
+            top = int(self.config['top{}'.format(i)])
+            bot = int(self.config['bot{}'.format(i)])
+            snap = pyautogui.screenshot(region=(left_bound, top, right_bound-left_bound, bot-top))
+            snap.save('./resources/rounds/r{}_slot{}.png'.format(self.round, i))
+
+        time.sleep(1)
 
 
 def main():
+    config = {}
+    with open('./config.txt') as file:
+        for line in file.readlines():
+            if line != "\n":
+                only_text = line.strip("\n")
+                pair = only_text.split(' = ')
+                config[pair[0]] = pair[1]
+    session = Session(config=config)
     while True:
         if keyboard.is_pressed('1'):
-            print('Breaking from loop.')
-            break
-        else:
-            pass
-
-    time.sleep(5)
-
-    for i in range(6):
-        odds = screenshot(region=(184, 367+(i*118), 71, 30))
-        odds.save('./odds/' + str(i) + 'ss' + str(random.randint(1, 19999)) + '.png')
+            session.take_pics_of_odds()
+            time.sleep(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+

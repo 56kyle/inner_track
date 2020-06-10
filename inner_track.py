@@ -1,7 +1,8 @@
 
-from actions import *
 import keyboard
 import input
+from pyautogui import *
+import random
 
 
 def find_odds():
@@ -10,11 +11,11 @@ def find_odds():
     print(pre_odds)
     odds = pre_odds
     shot = screenshot(region=(180, 320, 78, 680))
-    shot.save('./pics/horses.png')
+    shot.save('./horses.png')
     # Checks each pic of odds 1/1, 2/1, etc
     horses = []
     for n in odds:
-        for odd in list(locateAll('./odds/'+str(n)+'.png', './pics/horses.png', confidence=.92)):
+        for odd in list(locateAll('./odds/'+str(n)+'.png', './horses.png', confidence=.92)):
             add_horse = True
             for horse in horses:
                 if abs(horse[1][1] - (odd.top + 320)) < 30:
@@ -42,6 +43,11 @@ def enter_betting_menu():
     moveTo(p1.x, p1.y)
     input.enter()
     time.sleep(.1)
+
+
+def pause_until_odds_load():
+    while not locateOnScreen('./single_bet_black.png', confidence=.9):
+        pass
 
 
 def select_best_odds():
@@ -76,13 +82,15 @@ def back_to_starting_screen():
 def main():
     while True:
         if keyboard.is_pressed('1'):
+            print('dfdfdfd')
             break
     time.sleep(1)
-
     while not keyboard.is_pressed('0'):
         enter_betting_menu()
+        pause_until_odds_load()
         total_odds = select_best_odds()
         print(str(total_odds))
+        print(time.time())
         adjust_and_place_bet(total_odds)
         back_to_starting_screen()
 
