@@ -26,7 +26,7 @@ class Session:
 
 def main():
     config = {}
-    with open('./config.txt') as file:
+    with open('../config.txt') as file:
         for line in file.readlines():
             if line != "\n":
                 only_text = line.strip("\n")

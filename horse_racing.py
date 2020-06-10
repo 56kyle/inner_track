@@ -49,6 +49,7 @@ class Session:
             if pyautogui.locateOnScreen(self.end_screen_marker, confidence=.9):
                 return True
         else:
+            # Occaisionally the ending screen doesn't appear and you have to exit out with escape
             input.esc()
             time.sleep(1)
             input.enter()
@@ -76,25 +77,40 @@ class Session:
 
     def append_racers(self):
         racers_bounds = (150, 340, 340-150, 1000-340)
+        if pyautogui.position().x < 400:
+            pyautogui.moveTo(900, 400)
         snapshot = pyautogui.screenshot(region=racers_bounds)
         snapshot.save('./resources/temp/horses.png')
-        plausible_odds = list(range(1, 31))
-        for i in range(1, 31):
-            matching = pyautogui.locateAll('./resources/temp/horses.png', "./resources/odds/{}.png".format(i), confidence=self.required_confidence)
-            if len(matching) == 0:
-            if matching is not None:
-                for candidate in list(matching):
-                    adjusted_cand = Region(candidate.left + racers_bounds[0], candidate.top + racers_bounds[1], candidate.width, candidate.height)
-                    appending = True
-                    for racer in self.racers:
-                        if i == racer[0] and abs(adjusted_cand.top - racer[1].top) < 15:
-                            appending = False
-                    if appending:
-                        pyautogui.moveTo(adjusted_cand.left, adjusted_cand.top)
-                        self.racers.append((i, adjusted_cand))
+        plausible = list(range(1, 31))
+        self.required_confidence = .95
+        for i in plausible:
+            if not pyautogui.locateAll("./resources/odds/{}.png".format(i), "./resources/temp/horses.png", confidence=.91):
+                plausible.remove(i)
+        while len(self.racers) != 6:
+            print(self.required_confidence)
+            for i in plausible:
+                matching = pyautogui.locateAll("./resources/odds/{}.png".format(i), "./resources/temp/horses.png", confidence=self.required_confidence)
+                if matching:
+                    for candidate in matching:
+                        adjusted_cand = Region(candidate.left + racers_bounds[0], candidate.top + racers_bounds[1], candidate.width, candidate.height)
+                        appending = True
+                        for racer in self.racers:
+                            if abs(adjusted_cand.top - racer[1].top) < 15:
+                                appending = False
+                        if appending:
+                            self.racers.append((i, adjusted_cand))
+            if len(self.racers) > 6:
+                self.required_confidence = self.required_confidence * 1.01
+            elif len(self.racers) < 6:
+                self.required_confidence = self.required_confidence * .99
+            if len(self.racers) != 6:
+                self.racers = []
+            if self.required_confidence < .87:
+                raise Exception
 
     def place_bet(self):
-        pyautogui.moveTo(self.favored[1].left+random.randrange(1, 15), self.favored[1].top+random.randrange(1, 10))
+        favored_racer = (self.favored[1].left + random.randrange(1, 15), self.favored[1].top + random.randrange(1, 10))
+        pyautogui.moveTo(favored_racer)
         input.enter()
         if self.round_percentage < 95:
             self.rounds_max_bet += 1
@@ -105,7 +121,6 @@ class Session:
         submit_bet_button = Point(random.randrange(976, 1586), random.randrange(751, 839))
         pyautogui.moveTo(submit_bet_button)
         input.enter()
-        time.sleep(30)
 
     @staticmethod
     def go_back_to_beginning():
@@ -117,18 +132,21 @@ class Session:
 def main():
     session = Session()
 
-    open_up_bets = Action(session.open_bet_screen, session.is_start_screen_open)
-    find_odds = Action(session.determine_odds, session.is_bet_screen_open)
-    place_bet = Action(session.place_bet, session.is_bet_screen_open)
-    go_back_to_start = Action(session.go_back_to_beginning, session.is_end_screen_open)
+    open_up_bets = Action(session.open_bet_screen, session.is_start_screen_open, gta=session.gta)
+    find_odds = Action(session.determine_odds, session.is_bet_screen_open, gta=session.gta)
+    place_bet = Action(session.place_bet, session.is_bet_screen_open, gta=session.gta)
+    go_back_to_start = Action(session.go_back_to_beginning, session.is_end_screen_open, gta=session.gta)
 
+    end_iter_tab = False
     while True:
-        open_up_bets.act()
-        find_odds.act()
-        round_pic = pyautogui.screenshot()
-        round_pic.save("./resources/rounds/test/{}.png".format(session.total_rounds))
-        place_bet.act()
-        go_back_to_start.act()
+        if not end_iter_tab:
+            initial_tab = open_up_bets.act(tab=None, go_back=False)
+        else:
+            initial_tab = open_up_bets.act(tab=end_iter_tab, go_back=False)
+        find_odds.act(tab=initial_tab, go_back=False)
+        place_bet.act(tab=initial_tab, go_back=True)
+        time.sleep(31) # Sleeps the duration of the "race"
+        end_iter_tab = go_back_to_start.act(tab=None, go_back=False)
 
 
 if __name__ == "__main__":
