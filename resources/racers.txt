@@ -1,0 +1,6 @@
+Racer(color=Color(red=255, green=126, blue=0), odds=24),
+Racer(color=Color(red=255, green=98, blue=187), odds=23),
+Racer(color=Color(red=194, green=230, blue=255), odds=3),
+Racer(color=Color(red=255, green=191, blue=68), odds=10),
+Racer(color=Color(red=158, green=89, blue=71), odds=7),
+Racer(color=Color(red=82, green=217, blue=184), odds=3),

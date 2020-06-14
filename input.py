@@ -61,15 +61,15 @@ def release_key(hexKeyCode):
 
 
 def rand_press(scan_code):
-    time.sleep(.04 * random.randrange(1, 10))
+    time.sleep(.01 * random.randrange(10, 20, step=1))
     press_key(scan_code)
-    time.sleep(.04*random.randrange(1, 10))
+    time.sleep(.01 * random.randrange(10, 20, step=1))
     release_key(scan_code)
-    time.sleep(.04*random.randrange(1, 10))
+    time.sleep(.01 * random.randrange(10, 20, step=1))
 
 
 def rand_delay():
-    delay = random.randrange(1, 9) * .07
+    delay = random.randrange(1, 9) * .03
     time.sleep(delay)
 
 
