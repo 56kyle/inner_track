@@ -5,7 +5,6 @@ import input
 import pyautogui
 import time
 import collections
-import os
 
 Point = collections.namedtuple("Point", "x y")
 Region = collections.namedtuple("Region", "left top width height")
