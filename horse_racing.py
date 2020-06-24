@@ -5,6 +5,7 @@ import input
 import pyautogui
 import time
 import collections
+import keyboard
 
 Point = collections.namedtuple("Point", "x y")
 Region = collections.namedtuple("Region", "left top width height")
@@ -45,16 +46,8 @@ class Session:
     def is_end_screen_open(self):
         while not self.is_gta_focused():
             pass
-        t1 = time.time()
-        while time.time() <= t1 + 3:
-            if pyautogui.locateOnScreen(self.end_screen_marker, confidence=.9):
-                return True
-        else:
-            # Occaisionally the ending screen doesn't appear and you have to exit out with escape
-            input.esc()
-            time.sleep(1)
-            input.enter()
-            return True
+        # Just assume it is and move forward since it doesn't matter
+        return True
 
     @staticmethod
     def open_bet_screen():
@@ -163,8 +156,9 @@ class Session:
 
     @staticmethod
     def go_back_to_beginning():
-        bet_again_button = Point(random.randrange(724, 1198), random.randrange(955, 1039))
-        pyautogui.moveTo(bet_again_button)
+        out_of_the_way = Point(1000, 520)
+        pyautogui.moveTo(out_of_the_way)
+        input.esc()
         input.enter()
 
 
@@ -184,7 +178,7 @@ def main():
             initial_tab = open_up_bets.act(tab=end_iter_tab, go_back=False)
         find_odds.act(tab=initial_tab, go_back=False)
         place_bet.act(tab=initial_tab, go_back=True)
-        time.sleep(31)  # Sleeps the duration of the "race"
+        time.sleep(37)  # Sleeps the duration of the "race"
         end_iter_tab = go_back_to_start.act(tab=None, go_back=False)
 
 
